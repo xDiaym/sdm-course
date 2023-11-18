@@ -1,4 +1,3 @@
-
 uses Task, Objects, Drivers, Views, Menus, Dialogs, App;
 
 {---------------------------------------------------------------------------}
@@ -6,63 +5,67 @@ uses Task, Objects, Drivers, Views, Menus, Dialogs, App;
 {---------------------------------------------------------------------------}
 
 
-type TDoList = object(TApplication)
-     procedure InitMenuBar; virtual;
-     procedure InitDeskTop; virtual;
-     procedure InitStatusLine; virtual;
+type
+  TDoList = object(TApplication)
+    procedure InitMenuBar; virtual;
+    procedure InitDeskTop; virtual;
+    procedure InitStatusLine; virtual;
 
-     procedure HandleEvent(var Event: TEvent); virtual;
-     procedure AddTask;
-     procedure ClearAll; virtual;
-     end;
+    procedure HandleEvent(var Event: TEvent); virtual;
+    procedure AddTask;
+    procedure ClearAll; virtual;
+  end;
 
-     PMainWindow = ^TMainWindow;
-     TMainWindow = object(TDialog)
-     constructor Init(var Bounds: TRect);
-     procedure MakeInterior(Bounds: TRect);
-     end;
+  PMainWindow = ^TMainWindow;
+  TMainWindow = object(TDialog)
+    constructor Init(var Bounds: TRect);
+    procedure MakeInterior(Bounds: TRect);
+  end;
 
-     PInterior = ^TInterior;
-     TInterior = object(TListViewer)
-     List: PList;
-     constructor Init(var Bounds: TRect; AScrollBar: PScrollBar; NewList: PList);
-     procedure Draw; virtual;
-     function GetPalette: PPalette; virtual;
-     function GetText(Item: Integer; MaxLen: Integer): String; virtual;
-     procedure SelectItem(Item: Integer); virtual;
-     end;
+  PInterior = ^TInterior;
+  TInterior = object(TListViewer)
+    List: PList;
+    constructor Init(var Bounds: TRect; AScrollBar: PScrollBar; NewList: PList);
+    procedure Draw; virtual;
+    function GetPalette: PPalette; virtual;
+    function GetText(Item: Integer; MaxLen: Integer): String; virtual;
+    procedure SelectItem(Item: Integer); virtual;
+  end;
 
-     PNewDialog = ^TNewDialog;
-     TNewDialog = object(TDialog)
-     function GetPalette: PPalette; virtual;
-     end;
+  PNewDialog = ^TNewDialog;
+  TNewDialog = object(TDialog)
+    function GetPalette: PPalette; virtual;
+  end;
 
-     AddDialogData = record
-        InputTaskLine: String[100];
-        InputDateLine: String[10];
-     end;
+  AddDialogData = record
+    InputTaskLine: String[100];
+    InputDateLine: String[10];
+  end;
 
 
 {-----------------------------------VAR--------------------------------------}
 
 
-const cmClearAll = 100;
-      cmAddTask = 200;
-      cmSortByTime = 101;
+const
+  cmClearAll = 100;
+  cmAddTask = 200;
+  cmSortByTime = 101;
 
-var L: PList;
-    LineCount: Integer;
-    DefaultDate: TDate;
-    DefaultDialogData: AddDialogData;
-    NewDialogData: AddDialogData;
+var
+  L: PList;
+  LineCount: Integer;
+  DefaultDate: TDate;
+  DefaultDialogData: AddDialogData;
+  NewDialogData: AddDialogData;
 
 
 {-----------------------------TNewDialog-----------------------------------}
 
 
 function TNewDialog.GetPalette: PPalette;
-const CNewDialog = #1#3#30#0#0#1#2#30#0#15#15#17#0#15#3#30#0#0#15#17;
-      PNewDialog: string[Length(CNewDialog)] = CNewDialog;
+const
+  CNewDialog = #1#3#30#0#0#1#2#30#0#15#15#17#0#15#3#30#0#0#15#17;
+  PNewDialog: string[Length(CNewDialog)] = CNewDialog;
 begin
       GetPalette := @PNewDialog;
 end;
@@ -85,15 +88,17 @@ begin
 end;
 
 function TInterior.GetPalette: PPalette;
-const CInterior = #1#3#17;
-      PInterior: string[Length(CInterior)] = CInterior;
+const
+  CInterior = #1#3#17;
+  PInterior: string[Length(CInterior)] = CInterior;
 begin
       GetPalette := @PInterior;
 end;
 
 function TInterior.GetText(Item: Integer; MaxLen: Integer): String;
-var Answer: String;
-    T: PTask;
+var
+  Answer: String;
+  T: PTask;
 begin
      if (Item >= MaxLen) then GetText := 'Add new task...'
      else begin
@@ -122,9 +127,10 @@ end;
 
 
 procedure TMainWindow.MakeInterior(Bounds: TRect);
-var R: TRect;
-    ScrollBar: PScrollBar;
-    Interior : PInterior;
+var
+  R: TRect;
+  ScrollBar: PScrollBar;
+  Interior : PInterior;
 begin
     R.Assign(Bounds.B.X - 2, Bounds.A.Y + 1 , Bounds.B.X - 1, Bounds.B.Y -1);
     ScrollBar := New(PScrollBar, Init(R));
@@ -155,8 +161,9 @@ end;
 
 
 procedure TDoList.InitDeskTop;
-var R: TRect;
-    Window: PMainWindow;
+var
+  R: TRect;
+  Window: PMainWindow;
 begin
     inherited InitDeskTop;
     GetExtent(R); R.B.Y := R.B.Y - 2;
@@ -200,14 +207,15 @@ end;
 
 
 procedure InsertTask;
-var Info: string;
+var
+  Info: string;
 
-    DD, MM, YY: integer;
-    StrDD, StrMM, StrYY: String;
-    TempInt: Integer;
+  DD, MM, YY: integer;
+  StrDD, StrMM, StrYY: String;
+  TempInt: Integer;
 
-    index, flag: integer;
-    TempStr, HelpStr: string;
+  index, flag: integer;
+  TempStr, HelpStr: string;
 
 begin
     Info := NewDialogData.InputTaskLine;
@@ -239,9 +247,10 @@ end;
 
 
 procedure TDoList.AddTask;
-var Dialog: PNewDialog;
-    R: TRect; Bruce: PView;
-    C: Word;
+var
+  Dialog: PNewDialog;
+  R: TRect; Bruce: PView;
+  C: Word;
 begin
    R.Assign(0, 0, 45, 11);
    R.Move(22, 7);
@@ -278,8 +287,9 @@ end;
 
 
 procedure TDoList.ClearAll;
-var R: TRect; Dialog: PNewDialog;
-    C: Word;
+var
+  R: TRect; Dialog: PNewDialog;
+  C: Word;
 begin
     R.Assign(0, 0, 30, 5); R.Move(25, 7);
     Dialog := New(PNewDialog, Init(R, 'Are you sure?'));
